@@ -17,8 +17,8 @@ public class driveRobot_tester  extends OpMode {
         leftBack = hardwareMap.dcMotor.get("leftBack");
         rightFront = hardwareMap.dcMotor.get("rightFront");
         rightBack = hardwareMap.dcMotor.get("rightBack");
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     @Override
     public void loop(){
@@ -27,7 +27,8 @@ public class driveRobot_tester  extends OpMode {
         double turn = gamepad1.right_stick_x;  // Повороты
 
         double leftPower = drive - turn;
-        double rightPower = drive + turn;
+        double rightPower = drive +
+                turn;
 
         leftFront.setPower(leftPower);
         leftBack.setPower(leftPower);
@@ -43,6 +44,8 @@ public class driveRobot_tester  extends OpMode {
         rightBack.setPower(rightPower);
     }
 }
+
+
 
 
 

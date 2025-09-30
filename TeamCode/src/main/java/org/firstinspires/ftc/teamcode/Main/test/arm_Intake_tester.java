@@ -4,29 +4,23 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp
+@TeleOp(name = "arm_Intake_tester", group = "test")
 public class arm_Intake_tester extends OpMode {
 
     private CRServo take_1;
     private CRServo take_2;
     private DcMotor door;
 
-    private Servo clutch_1;
-    private Servo clutch_2;
-
     private boolean intakeReverse = false;
     private boolean dpadDownPressedLast = false;
     private boolean dpadUpPressedLast = false;
-    private boolean dpadLeftPressedLast = false;
-    private boolean dpadRightPressedLast = false;
 
     private int doorStartPosition = 0;
     private int targetPosition = 0;
 
-    // PID constants — tune if needed
+    // PID constants
     private static final double kP = 0.02;
     private static final double kI = 0.006;
     private static final double kD = 0.001;
@@ -38,19 +32,11 @@ public class arm_Intake_tester extends OpMode {
 
     private ElapsedTime timer = new ElapsedTime();
 
-    // Servo positions
-    private final double CLUTCH_INITIAL = 0.0;
-    private final double CLUTCH_EXTENDED = 1.0;
-
     @Override
     public void init() {
         take_1 = hardwareMap.get(CRServo.class, "take_1");
         take_2 = hardwareMap.get(CRServo.class, "take_2");
         door = hardwareMap.get(DcMotor.class, "door");
-
-        clutch_1 = hardwareMap.get(Servo.class, "clutch_1");
-        clutch_2 = hardwareMap.get(Servo.class, "clutch_2");
-        clutch_1.setDirection(Servo.Direction.REVERSE);
 
         take_1.setDirection(CRServo.Direction.REVERSE);
 
@@ -62,16 +48,13 @@ public class arm_Intake_tester extends OpMode {
         doorStartPosition = 0;
         targetPosition = doorStartPosition;
 
-        clutch_1.setPosition(CLUTCH_INITIAL);
-        clutch_2.setPosition(CLUTCH_INITIAL);
-
         timer.reset();
     }
 
     @Override
     public void loop() {
 
-        // --- D-PAD UP (move -30) ---
+        // --- D-PAD UP: move -150 ticks ---
         if (gamepad2.dpad_up && !dpadUpPressedLast) {
             targetPosition -= 150;
             dpadUpPressedLast = true;
@@ -79,7 +62,7 @@ public class arm_Intake_tester extends OpMode {
             dpadUpPressedLast = false;
         }
 
-        // --- X BUTTON (run intakes forward while holding) ---
+        // --- X BUTTON: intake forward ---
         if (gamepad2.x) {
             take_1.setPower(1.0);
             take_2.setPower(1.0);
@@ -88,7 +71,7 @@ public class arm_Intake_tester extends OpMode {
             take_2.setPower(0.0);
         }
 
-        // --- D-PAD DOWN (toggle reverse/stopped) ---
+        // --- D-PAD DOWN: toggle reverse ---
         if (gamepad2.dpad_down) {
             if (!dpadDownPressedLast) {
                 if (!intakeReverse) {
@@ -107,25 +90,7 @@ public class arm_Intake_tester extends OpMode {
             dpadDownPressedLast = false;
         }
 
-        // --- D-PAD LEFT (set clutch servos to +1) ---
-        if (gamepad2.dpad_left && !dpadLeftPressedLast) {
-            clutch_1.setPosition(CLUTCH_EXTENDED);
-            clutch_2.setPosition(CLUTCH_EXTENDED);
-            dpadLeftPressedLast = true;
-        } else if (!gamepad2.dpad_left) {
-            dpadLeftPressedLast = false;
-        }
-
-        // --- D-PAD RIGHT (set clutch servos to -1 logical / 0.0 actual) ---
-        if (gamepad2.dpad_right && !dpadRightPressedLast) {
-            clutch_1.setPosition(CLUTCH_INITIAL);
-            clutch_2.setPosition(CLUTCH_INITIAL);
-            dpadRightPressedLast = true;
-        } else if (!gamepad2.dpad_right) {
-            dpadRightPressedLast = false;
-        }
-
-        // ---------- PID POSITION CONTROL (new style) -----------
+        // ---------- PID POSITION CONTROL ----------
         double deltaTime = timer.seconds();
         if (deltaTime < 0.001) deltaTime = 0.001;
 
@@ -147,7 +112,6 @@ public class arm_Intake_tester extends OpMode {
         telemetry.addData("Door Pos", currentPos);
         telemetry.addData("Target Pos", targetPosition);
         telemetry.addData("Output", output);
-        telemetry.addData("Clutch Pos", clutch_1.getPosition());
         telemetry.update();
     }
 }
