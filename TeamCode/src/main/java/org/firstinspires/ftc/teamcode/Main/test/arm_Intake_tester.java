@@ -13,9 +13,8 @@ public class arm_Intake_tester extends OpMode {
     private CRServo take_2;
     private DcMotor door;
 
-    private boolean intakeReverse = false;
-    private boolean dpadDownPressedLast = false;
     private boolean dpadUpPressedLast = false;
+    private boolean dpadDownPressedLast = false;
 
     private int doorStartPosition = 0;
     private int targetPosition = 0;
@@ -62,32 +61,24 @@ public class arm_Intake_tester extends OpMode {
             dpadUpPressedLast = false;
         }
 
-        // --- X BUTTON: intake forward ---
-        if (gamepad2.x) {
-            take_1.setPower(1.0);
-            take_2.setPower(1.0);
-        } else if (!intakeReverse) {
-            take_1.setPower(0.0);
-            take_2.setPower(0.0);
+        // --- D-PAD DOWN: return to initial position ---
+        if (gamepad2.dpad_down && !dpadDownPressedLast) {
+            targetPosition = doorStartPosition;
+            dpadDownPressedLast = true;
+        } else if (!gamepad2.dpad_down) {
+            dpadDownPressedLast = false;
         }
 
-        // --- D-PAD DOWN: toggle reverse ---
-        if (gamepad2.dpad_down) {
-            if (!dpadDownPressedLast) {
-                if (!intakeReverse) {
-                    take_1.setPower(-1.0);
-                    take_2.setPower(-1.0);
-                    intakeReverse = true;
-                } else {
-                    take_1.setPower(0.0);
-                    take_2.setPower(0.0);
-                    intakeReverse = false;
-                    targetPosition = doorStartPosition;
-                }
-            }
-            dpadDownPressedLast = true;
+        // --- CRServos Control with Square and Circle ---
+        if (gamepad2.x) { // Square button → forward
+            take_1.setPower(1.0);
+            take_2.setPower(1.0);
+        } else if (gamepad2.b) { // Circle button → reverse
+            take_1.setPower(-1.0);
+            take_2.setPower(-1.0);
         } else {
-            dpadDownPressedLast = false;
+            take_1.setPower(0.0);
+            take_2.setPower(0.0);
         }
 
         // ---------- PID POSITION CONTROL ----------

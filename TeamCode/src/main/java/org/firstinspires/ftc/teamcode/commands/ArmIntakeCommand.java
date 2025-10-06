@@ -1,31 +1,63 @@
 package org.firstinspires.ftc.teamcode.commands;
 
-import org.firstinspires.ftc.teamcode.framework.Command;
 import org.firstinspires.ftc.teamcode.subsystems.ArmIntakeSubsystem;
 
 import java.util.function.BooleanSupplier;
 
-public class ArmIntakeCommand extends Command {
-    private final ArmIntakeSubsystem intake;
+public class ArmIntakeCommand {
+    private final ArmIntakeSubsystem arm;
     private final BooleanSupplier dpadUp;
     private final BooleanSupplier dpadDown;
+    private final BooleanSupplier squareX; // x button
+    private final BooleanSupplier circleB; // b button
 
-    public ArmIntakeCommand(ArmIntakeSubsystem intake,
+    private boolean dpadUpHandledLast = false;
+    private boolean dpadDownHandledLast = false;
+
+    public ArmIntakeCommand(ArmIntakeSubsystem arm,
                             BooleanSupplier dpadUp,
-                            BooleanSupplier dpadDown) {
-        this.intake = intake;
+                            BooleanSupplier dpadDown,
+                            BooleanSupplier squareX,
+                            BooleanSupplier circleB) {
+        this.arm = arm;
         this.dpadUp = dpadUp;
         this.dpadDown = dpadDown;
+        this.squareX = squareX;
+        this.circleB = circleB;
     }
 
-    @Override
     public void execute() {
+        // D-PAD up edge: step target -150
         if (dpadUp.getAsBoolean()) {
-            intake.dpadUpAction();
-        } else if (dpadDown.getAsBoolean()) {
-            intake.dpadDownAction();
+            if (!dpadUpHandledLast) {
+                arm.stepTargetMinus150();
+                dpadUpHandledLast = true;
+            }
         } else {
-            intake.resetDpadDownFlag();
+            dpadUpHandledLast = false;
         }
+
+        // D-PAD down edge: reset to start
+        if (dpadDown.getAsBoolean()) {
+            if (!dpadDownHandledLast) {
+                arm.resetTargetToStart();
+                dpadDownHandledLast = true;
+            }
+        } else {
+            dpadDownHandledLast = false;
+        }
+
+        // CRServo manual control: X -> forward, B -> reverse, else stop
+        if (squareX.getAsBoolean()) {
+            arm.setTakePower(1.0);
+        } else if (circleB.getAsBoolean()) {
+            arm.setTakePower(-1.0);
+        } else {
+            // no manual drum input here; keep 0
+            arm.setTakePower(0.0);
+        }
+
+        // PID runs in subsystem.periodic() from main loop
     }
 }
+

@@ -39,11 +39,11 @@ public class hang_tester extends OpMode {
     public void loop() {
 
 
-        if(gamepad1.dpad_up) {
+        if(gamepad1.dpad_left) {
             hang_1.setPower(1);
             hang_2.setPower(1);
             suck.setPower(1);
-        } else if (gamepad1.dpad_down){
+        } else if (gamepad1.dpad_right){
             hang_1.setPower(-1);
             hang_2.setPower(-1);
             suck.setPower(-1);

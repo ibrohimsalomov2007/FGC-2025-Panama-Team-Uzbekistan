@@ -5,29 +5,31 @@ import java.util.List;
 
 public class CommandScheduler {
     private static CommandScheduler instance;
-    private final List<Command> activeCommands = new ArrayList<>();
+    private final List<Command> active = new ArrayList<>();
 
     public static CommandScheduler getInstance() {
-        if (instance == null) {
-            instance = new CommandScheduler();
-        }
+        if (instance == null) instance = new CommandScheduler();
         return instance;
     }
 
-    public void schedule(Command command) {
-        activeCommands.add(command);
+    public void schedule(Command c) {
+        if (c != null) active.add(c);
     }
 
     public void run() {
         List<Command> finished = new ArrayList<>();
-        for (Command command : activeCommands) {
-            command.execute();
-            if (command.isFinished()) {
-                command.end();
-                finished.add(command);
+        for (Command c : new ArrayList<>(active)) {
+            c.execute();
+            if (c.isFinished()) {
+                c.end();
+                finished.add(c);
             }
         }
-        activeCommands.removeAll(finished);
+        active.removeAll(finished);
+    }
+
+    public void cancelAll() {
+        for (Command c : active) c.end();
+        active.clear();
     }
 }
-

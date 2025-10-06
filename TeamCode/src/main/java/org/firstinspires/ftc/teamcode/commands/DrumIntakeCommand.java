@@ -1,31 +1,23 @@
 package org.firstinspires.ftc.teamcode.commands;
 
-import org.firstinspires.ftc.teamcode.framework.Command;
 import org.firstinspires.ftc.teamcode.subsystems.DrumIntakeSubsystem;
+import java.util.function.DoubleSupplier;
 
-import java.util.function.BooleanSupplier;
-
-public class DrumIntakeCommand extends Command {
+public class DrumIntakeCommand {
     private final DrumIntakeSubsystem drum;
-    private final BooleanSupplier dpadUp;
-    private final BooleanSupplier dpadDown;
+    private final DoubleSupplier forwardTrigger;
+    private final DoubleSupplier reverseTrigger;
 
     public DrumIntakeCommand(DrumIntakeSubsystem drum,
-                             BooleanSupplier dpadUp,
-                             BooleanSupplier dpadDown) {
+                             DoubleSupplier forwardTrigger,
+                             DoubleSupplier reverseTrigger) {
         this.drum = drum;
-        this.dpadUp = dpadUp;
-        this.dpadDown = dpadDown;
+        this.forwardTrigger = forwardTrigger;
+        this.reverseTrigger = reverseTrigger;
     }
 
-    @Override
     public void execute() {
-        if (dpadUp.getAsBoolean()) {
-            drum.setPower(1);
-        } else if (dpadDown.getAsBoolean()) {
-            drum.setPower(-1);
-        } else {
-            drum.setPower(0);
-        }
+        double power = forwardTrigger.getAsDouble() - reverseTrigger.getAsDouble();
+        drum.move(power);
     }
 }

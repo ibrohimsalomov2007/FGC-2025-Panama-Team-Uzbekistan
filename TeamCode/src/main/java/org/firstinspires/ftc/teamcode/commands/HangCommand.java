@@ -1,22 +1,21 @@
 package org.firstinspires.ftc.teamcode.commands;
 
 import org.firstinspires.ftc.teamcode.subsystems.HangSubsystem;
-
-import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 public class HangCommand {
     private final HangSubsystem hang;
-    private final BooleanSupplier up, down;
+    private final DoubleSupplier upTrigger;
+    private final DoubleSupplier downTrigger;
 
-    public HangCommand(HangSubsystem hang, BooleanSupplier up, BooleanSupplier down) {
+    public HangCommand(HangSubsystem hang, DoubleSupplier upTrigger, DoubleSupplier downTrigger) {
         this.hang = hang;
-        this.up = up;
-        this.down = down;
+        this.upTrigger = upTrigger;
+        this.downTrigger = downTrigger;
     }
 
     public void execute() {
-        if (up.getAsBoolean()) hang.move(1);
-        else if (down.getAsBoolean()) hang.move(-1);
-        else hang.stop();
+        double power = upTrigger.getAsDouble() - downTrigger.getAsDouble();
+        hang.move(power);
     }
 }

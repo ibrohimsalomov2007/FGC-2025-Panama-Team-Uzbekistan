@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode.framework;
 
 public interface Subsystem {
-    void periodic();
+    void periodic(); // called from main loop
 }

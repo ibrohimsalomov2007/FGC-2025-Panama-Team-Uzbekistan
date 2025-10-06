@@ -13,8 +13,8 @@ public class push_tester extends OpMode {
     private Servo clutch_1;
     private Servo clutch_2;
 
-    private boolean dpadLeftPressedLast = false;
-    private boolean dpadRightPressedLast = false;
+    private boolean crossPressedLast = false;
+    private boolean trianglePressedLast = false;
 
     private final double PUSH_INITIAL = 1.0;
     private final double PUSH_EXTENDED = 0.0;
@@ -25,7 +25,7 @@ public class push_tester extends OpMode {
     private final double CLUTCH_ENGAGED_2 = 0.9;
 
     // State tracking for dpad_left sequence
-    private boolean dpadLeftSequenceActive = false;
+    private boolean crossSequenceActive = false;
     private boolean pushCommanded = false;
     private boolean clutchEngaged = false;
     private ElapsedTime timer = new ElapsedTime();
@@ -49,17 +49,17 @@ public class push_tester extends OpMode {
     public void loop() {
 
         // === D-PAD LEFT sequence ===
-        if (gamepad2.dpad_left && !dpadLeftPressedLast) {
-            dpadLeftSequenceActive = true;
+        if (gamepad2.cross && !crossPressedLast) {
+            crossSequenceActive = true;
             pushCommanded = false;
             clutchEngaged = false;
             timer.reset();
-            dpadLeftPressedLast = true;
-        } else if (!gamepad2.dpad_left) {
-            dpadLeftPressedLast = false;
+            crossPressedLast = true;
+        } else if (!gamepad2.cross) {
+            crossPressedLast = false;
         }
 
-        if (dpadLeftSequenceActive) {
+        if (crossSequenceActive) {
             // Step 1: command push to go to 0
             if (!pushCommanded) {
                 push_1.setPosition(PUSH_EXTENDED);
@@ -79,27 +79,27 @@ public class push_tester extends OpMode {
             if (clutchEngaged && timer.milliseconds() > 1000) { // adjust if your servos are slower
                 clutch_1.setPosition(CLUTCH_INITIAL_1);
                 clutch_2.setPosition(CLUTCH_INITIAL_2);
-                dpadLeftSequenceActive = false;
+                crossSequenceActive = false;
             }
         }
 
         // === D-PAD RIGHT (simple version as before) ===
-        if (gamepad2.dpad_right && !dpadRightPressedLast) {
+        if (gamepad2.triangle && !trianglePressedLast) {
             push_1.setPosition(PUSH_INITIAL);
             push_2.setPosition(PUSH_INITIAL);
             engageClutches();
             sleep(500);
             disengageClutches();
-            dpadRightPressedLast = true;
-        } else if (!gamepad2.dpad_right) {
-            dpadRightPressedLast = false;
+            trianglePressedLast = true;
+        } else if (!gamepad2.triangle) {
+            trianglePressedLast = false;
         }
 
         telemetry.addData("Push 1 Pos", push_1.getPosition());
         telemetry.addData("Push 2 Pos", push_2.getPosition());
         telemetry.addData("Clutch 1 Pos", clutch_1.getPosition());
         telemetry.addData("Clutch 2 Pos", clutch_2.getPosition());
-        telemetry.addData("Left Seq Active", dpadLeftSequenceActive);
+        telemetry.addData("Left Seq Active", crossSequenceActive);
         telemetry.update();
     }
 
